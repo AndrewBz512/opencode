@@ -1,0 +1,39 @@
+name: Test Moonshot API Key
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check key status
+        env:
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+        run: |
+          echo "Testing MOONSHOT_API_KEY..."
+          if [ -z "$MOONSHOT_API_KEY" ]; then
+            echo "❌ FAIL: MOONSHOT_API_KEY secret is not set in this repo"
+            exit 1
+          fi
+          echo "✓ Secret exists"
+          
+          echo ""
+          echo "Calling Moonshot balance API..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer $MOONSHOT_API_KEY" \
+            "https://api.moonshot.ai/v1/users/me/balance")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✓ API key valid - Status $HTTP_CODE"
+            echo ""
+            echo "Balance: $BODY" | head -c 200
+            echo "..."
+          else
+            echo "❌ FAIL: HTTP $HTTP_CODE"
+            echo "$BODY"
+            exit 1
+          fi
