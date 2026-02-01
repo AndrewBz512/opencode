@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Check key status
         env:
-          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+          MOONSHOT_API_KEY: ${{sk-mz1CY8cAZsNJsK7tyhywoInCIXrlCcrK05NDxnpk9XLY1AuE}}
         run: |
           echo "Testing MOONSHOT_API_KEY..."
           if [ -z "$MOONSHOT_API_KEY" ]; then
